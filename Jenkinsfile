@@ -9,7 +9,7 @@ node ('docker'){
     redisImg.pull()
 
     docker.withRegistry('https://swarm.service.dc1.consul:12345') {
-        stage 'Mirror'
+        stage 'Get SCM content'
           checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/VAdamec/jenkinspipelines.git']]])
 
         stage 'Build Docker image'
@@ -22,10 +22,10 @@ node ('docker'){
           def testerImg = docker.build("jenkinspipeline/tester:${env.BUILD_TAG}", 'tester/')
           testerImg.push();
 
-        stage 'Test Image'
-            sh "docker-compose up"
+        stage 'Integration tests - run composer'
+            sh "docker-compose up --build"
 
-        stage name: 'Promote Image', concurrency: 1
+        stage name: 'Promote Image to master', concurrency: 3
           appImg.push('master');
           backendImg.push('master');
           testerImg.push('master');
