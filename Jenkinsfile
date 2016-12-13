@@ -23,9 +23,18 @@ node ('docker'){
           testerImg.push();
 
         stage 'Integration tests - run composer'
+
+        try {
             sh "docker-compose up --build -d"
             sh "docker exec demo2_tester_1 python /code/app/sample/app_unit.py"
             sh "docker-compose down"
+            currentBuild.result = 'SUCCESS'
+            }
+        catch (Exception err) {
+            currentBuild.result = 'FAILURE'
+        }
+
+    echo "RESULT: ${currentBuild.result}"
 
         stage name: 'Promote Image to master', concurrency: 3
           appImg.push('master');

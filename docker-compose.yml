@@ -1,5 +1,11 @@
 version: '2'
 services:
+  frontend:
+    build: ./frontend/
+    ports:
+      - "58080:8080"
+    links:
+      - app
   app:
     build: ./app/
     command: python app.py

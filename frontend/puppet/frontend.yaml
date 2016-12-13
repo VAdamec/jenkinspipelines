@@ -1,0 +1,9 @@
+nginx::nginx_upstreams:
+  'flask_app':
+    ensure: present
+    members:
+      - app:5000
+nginx::nginx_vhosts:
+  'swarm.service.dc1.consul':
+    listen_port: '8080'
+    proxy: 'http://flask_app'

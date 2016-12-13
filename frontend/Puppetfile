@@ -1,6 +1,6 @@
 forge "https://forgeapi.puppetlabs.com"
 
-mod 'puppetlabs-razor'
+mod 'puppetlabs/concat', "2.2.0"
 mod 'puppetlabs/stdlib', "4.6.0"
-mod 'camptocamp/augeas', "1.1.6"
+mod 'puppetlabs/apt', "2.3.0"
 mod "puppet/nginx", "0.5.0"
