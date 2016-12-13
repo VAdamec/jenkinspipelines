@@ -6,14 +6,12 @@ services:
     volumes:
       - ./app/sample:/app
     ports:
-      - "5000:5000"
+      - "15000:5000"
     links:
       - backend
   backend:
     build: ./backend
     command: redis-server
-    ports:
-      - "6379:6379"
     volumes:
       - ./tmp/redis:/data
   tester:
