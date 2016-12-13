@@ -23,7 +23,9 @@ node ('docker'){
           testerImg.push();
 
         stage 'Integration tests - run composer'
-            sh "docker-compose up --build"
+            sh "docker-compose up --build -d"
+            sh "docker exec demo2_tester_1 python /code/app/sample/app_unit.py"
+            sh "docker-compose down"
 
         stage name: 'Promote Image to master', concurrency: 3
           appImg.push('master');
