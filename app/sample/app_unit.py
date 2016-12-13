@@ -1,12 +1,17 @@
+#!/usr/bin/env python -W ignore::DeprecationWarning
+
 import app
 import unittest
 import json
 from random import randint
+import warnings
+
 
 mocked_value = randint(0,255)
 
 class AppTestCase(unittest.TestCase):
     def setUp(self):
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         self.app = app.app.test_client()
 
     #not needed now
@@ -16,14 +21,14 @@ class AppTestCase(unittest.TestCase):
         headers = [('Content-Type', 'application/json')]
         data ="{'wrong'}"
         headers.append( ('Content-Length', len(data)) )
-        rv = self.app.put( '/sensor', headers=headers, data=data)
+        rv = self.app.put( '/', headers=headers, data=data)
         self.assertEqual(rv.status_code, 400)
 
     def test_02_put_good_data(self):
         headers = [('Content-Type', 'application/json')]
         data = json.dumps({"value":mocked_value})
         headers.append( ('Content-Length', len(data)) )
-        rv = self.app.put( '/sensor', headers=headers, data=data)
+        rv = self.app.put( '/', headers=headers, data=data)
         rv_object = json.loads(rv.data)
         self.assertEqual(rv.status_code, 201)
         self.assertEqual(rv_object["value"], mocked_value )
@@ -32,7 +37,7 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(rv_object["ttl"], 31104000)
 
     def test_03_get_put_value(self):
-        rv = self.app.get('/sensor')
+        rv = self.app.get('/')
         rv_object = json.loads(rv.data)
         self.assertEqual(rv_object["value"], mocked_value )
         assert "last_updated" in rv_object

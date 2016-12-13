@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python -W ignore::DeprecationWarning
 
 # Dependencies:
 # pip install flask
