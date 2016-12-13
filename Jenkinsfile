@@ -47,5 +47,30 @@ node ('docker'){
           appImg.push('master');
           backendImg.push('master');
           testerImg.push('master');
+
+        stage name: 'Deploy newly build images to staging'
+          sh "echo RUNPROVISION.sh STG"
+
+        stage name: 'Run staging tests'
+          sh "echo RUNTEST.sh STG"
+
+        stage name: 'Deploy newly build images to production - BLUE'
+          input message: 'Waiting for approve', ok: 'Approve'
+          sh "echo RUNPROVISION.sh PROD BLUE"
+
+        stage name: 'Run production tests - BLUE'
+          sh "echo RUNTEST.sh PROD BLUE"
+
+        stage name: 'Run production tests - promote BLUE as a production'
+          sh "echo RUNSWITCH.sh PROD BLUE"
+
+        stage name: 'Deploy newly build images to production - GREEN'
+          sh "echo RUNPROVISION.sh PROD GREEN"
+
+        stage name: 'Run production tests - GREEN'
+          sh "echo RUNTEST.sh PROD GREEN"
+
+        stage name: 'Run production tests - promote GREEN as a production'
+          sh "echo RUNSWITCH.sh PROD GREEN"
     }
 }
