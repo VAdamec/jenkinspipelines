@@ -1,0 +1,25 @@
+version: '2'
+services:
+  app:
+    build: ./app/
+    command: python app.py
+    volumes:
+      - ./app/sample:/app
+    ports:
+      - "5000:5000"
+    links:
+      - backend
+  backend:
+    build: ./backend
+    command: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./tmp/redis:/data
+  tester:
+    build: ./tester
+    links:
+      - backend
+      - app
+    volumes:
+      - ./:/code
