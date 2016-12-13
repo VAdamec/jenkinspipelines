@@ -27,6 +27,7 @@ node ('docker'){
         try {
             sh "docker-compose up --build -d"
             sh "docker exec demo2_tester_1 python /code/app/sample/app_unit.py"
+            sh "docker exec demo2_tester_1 curl -v -H "Content-Type: application/json" -X PUT -d '{"value":123}' http://frontend:8080"  
             sh "docker-compose down"
             currentBuild.result = 'SUCCESS'
             }

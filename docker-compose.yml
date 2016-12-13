@@ -4,6 +4,8 @@ services:
     build: ./frontend/
     ports:
       - "58080:8080"
+    expose:
+      - "8080"
     links:
       - "app"
   app:
@@ -27,6 +29,7 @@ services:
   tester:
     build: ./tester
     links:
+      - frontend
       - backend
       - app
     volumes:
