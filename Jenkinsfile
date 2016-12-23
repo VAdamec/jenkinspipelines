@@ -26,10 +26,15 @@ node ('docker'){
             parallel(firstTask: {
                 try {
                         sh "/usr/local/bin/docker-compose up --build -d"
-                        sh "docker exec demo2_tester_1 python /code/app/sample/app_unit.py"
+                        TESTER = sh (
+                            script: "docker ps | grep tester | cut -f 1 -d ' '",
+                            returnStatus: true
+                        ) == 0
+
+                        sh "docker exec ${TESTER} python /code/app/sample/app_unit.py"
 
                         RUN_CURL_TEST = sh (
-                            script: 'docker exec demo2_tester_1 curl -v -H "Content-Type: application/json" -X PUT -d \'{"value":123}\' http://frontend:8080',
+                            script: 'docker exec ${TESTER} curl -v -H "Content-Type: application/json" -X PUT -d \'{"value":123}\' http://frontend:8080',
                             returnStatus: true
                         ) == 0
                         echo "CURL test output: ${RUN_CURL_TEST}"
