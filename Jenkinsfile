@@ -35,8 +35,8 @@ node ('docker'){
 
                         RUN_CURL_TEST = sh (
                             script: 'docker exec ${TESTER} curl -v -H "Content-Type: application/json" -X PUT -d \'{"value":123}\' http://frontend:8080',
-                            returnStatus: true
-                        ) == 0
+                            returnStdout: true
+                        ).trim()
                         echo "CURL test output: ${RUN_CURL_TEST}"
 
                         sh "docker-compose down"
