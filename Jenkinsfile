@@ -23,7 +23,30 @@ node ('docker'){
           testerImg.push();
 
         stage 'Integration tests - run composer'
-        runTests()
+            parallel(firstTask: {
+                try {
+                        sh "/usr/local/bin/docker-compose up --build -d"
+                        sh "docker exec demo2_tester_1 python /code/app/sample/app_unit.py"
+
+                        RUN_CURL_TEST = sh (
+                            script: 'docker exec demo2_tester_1 curl -v -H "Content-Type: application/json" -X PUT -d \'{"value":123}\' http://frontend:8080',
+                            returnStatus: true
+                        ) == 0
+                        echo "CURL test output: ${RUN_CURL_TEST}"
+
+                        sh "docker-compose down"
+                        currentBuild.result = 'SUCCESS'
+                        }
+                catch (Exception err) {
+                      currentBuild.result = 'FAILURE'
+                }
+            }, secondTask: {
+               sh "echo RUNNING SOME OTHER TEST"
+               sh "sleep 10"
+            }, thirdTask: {
+               sh "echo RUNNING SOME OTHER TEST"
+               sh "sleep 10"
+            })
 
     echo "RESULT: ${currentBuild.result}"
 
@@ -57,23 +80,4 @@ node ('docker'){
         stage name: 'Run production tests - promote GREEN as a production'
           sh "echo RUNSWITCH.sh PROD GREEN"
     }
-}
-
-void runTests(def args) {
-    try {
-            sh "docker-compose up --build -d"
-            sh "docker exec demo2_tester_1 python /code/app/sample/app_unit.py"
-
-            RUN_CURL_TEST = sh (
-                script: 'docker exec demo2_tester_1 curl -v -H "Content-Type: application/json" -X PUT -d \'{"value":123}\' http://frontend:8080',
-                returnStatus: true
-            ) == 0
-            echo "CURL test output: ${RUN_CURL_TEST}"
-
-            sh "docker-compose down"
-            currentBuild.result = 'SUCCESS'
-            }
-        catch (Exception err) {
-            currentBuild.result = 'FAILURE'
-        }
 }
