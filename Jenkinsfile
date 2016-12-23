@@ -8,7 +8,7 @@ node ('docker'){
     pythonImg.pull()
     redisImg.pull()
 
-    docker.withRegistry('https://swarm.service.dc1.consul:12345') {
+    docker.withRegistry('http://registry.marathon.l4lb.thisdcos.directory:5000') {
         stage 'Get SCM content'
           checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/VAdamec/jenkinspipelines.git']]])
 
