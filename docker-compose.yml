@@ -3,7 +3,7 @@ services:
   frontend:
     build: ./frontend/
     ports:
-      - "58080:8080"
+      - "48080:8080"
     expose:
       - "8080"
     links:
