@@ -10,7 +10,7 @@ node ('docker'){
 
     docker.withRegistry('http://registry.marathon.l4lb.thisdcos.directory:5000') {
         stage 'Get SCM content'
-          checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/VAdamec/jenkinspipelines.git']]])
+          checkout([$class: 'GitSCM', branches: [[name: '*/testing']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/VAdamec/jenkinspipelines.git']]])
 
         stage 'Build Docker image'
           def appImg = docker.build("jenkinspipeline/app:${env.BUILD_TAG}", 'app/')
@@ -25,11 +25,11 @@ node ('docker'){
         stage 'Integration tests - run composer'
             parallel(firstTask: {
                 try {
-                        sh "/usr/local/bin/docker-compose up --build -d"
-                        TESTER = sh (
-                            script: "docker ps | grep tester | cut -f 1 -d ' '",
-                            returnStdout: true
-                        ).trim()
+                        sh "/usr/local/bin/docker-compose up --no-cache --force-recreate --remove-orphans -d"
+                        sh "sleep 5"
+                        
+                        def TESTER = sh(script: 'docker ps | grep tester | cut -f 1 -d " " | head -n 1', returnStdout: true).trim()
+                        println TESTER
 
                         sh "docker exec ${TESTER} python /code/app/sample/app_unit.py"
 
@@ -56,6 +56,7 @@ node ('docker'){
     echo "RESULT: ${currentBuild.result}"
 
         stage name: 'Promote Image to master', concurrency: 3
+          sh "docker-compose down"
           appImg.push('master');
           backendImg.push('master');
           testerImg.push('master');
