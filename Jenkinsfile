@@ -28,8 +28,8 @@ node ('docker'){
                         sh "/usr/local/bin/docker-compose up --build -d"
                         TESTER = sh (
                             script: "docker ps | grep tester | cut -f 1 -d ' '",
-                            returnStatus: true
-                        ) == 0
+                            returnStdout: true
+                        ).trim()
 
                         sh "docker exec ${TESTER} python /code/app/sample/app_unit.py"
 
